@@ -7,21 +7,28 @@ import cucumber.api.java.es.Entonces;
 import net.serenitybdd.screenplay.actions.Open;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.actors.OnlineCast;
+import org.hamcrest.core.IsEqual;
+import questions.ApareceElElemento;
+import questions.ElTextoEn;
+import questions.HayAlMenos;
 import tasks.Buscar;
 
+import static net.serenitybdd.screenplay.EventualConsequence.eventually;
+import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.actors.OnStage.theActorCalled;
 import static net.serenitybdd.screenplay.actors.OnStage.theActorInTheSpotlight;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class BuscarVideoStepdefinition {
 
     @Before
-    public void setUp(){
+    public void setUp() {
         OnStage.setTheStage(new OnlineCast());
     }
 
     @Dado("^que (.*) quiere ver un video$")
     public void queSebastianQuiereVerUnVideo(String actor) {
-        theActorCalled(actor).wasAbleTo( Open.url("https://www.youtube.com/") );
+        theActorCalled(actor).wasAbleTo(Open.url("https://www.youtube.com/"));
     }
 
     @Cuando("^busca el video (.*)$")
@@ -29,8 +36,12 @@ public class BuscarVideoStepdefinition {
         theActorInTheSpotlight().attemptsTo(Buscar.unVideo(criterioDeBusqueda));
     }
 
-    @Entonces("^debe ver por lo menos (\\d+) video en lista$")
-    public void debeVerPorLoMenosVideoEnLista(int cantidadDeVideos) {
-
+    @Entonces("^debe ver por lo menos (\\d+) video en lista (.*)$")
+    public void  debeVerPorLoMenosVideoEnLista(int cantidadDeVideos, String mensaje) {
+        theActorInTheSpotlight().should(
+                seeThat(HayAlMenos.unResultado(cantidadDeVideos)),
+                eventually(seeThat(ApareceElElemento.filtrar())),
+                seeThat(ElTextoEn.elElementoFiltrar(), equalTo(mensaje))
+        );
     }
 }
